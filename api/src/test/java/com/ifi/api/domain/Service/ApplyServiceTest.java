@@ -2,11 +2,17 @@ package com.ifi.api.domain.Service;
 
 import com.ifi.api.Service.ApplyService;
 import com.ifi.api.repository.CouponRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -30,6 +36,36 @@ class ApplyServiceTest {
 
         // then
         assertThat(count).isEqualTo(1);
+    }
+
+    @DisplayName("여러명 응모")
+    @Test
+    public void tryMultiple() throws InterruptedException {
+        // given
+        int threadCount = 1000;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        // 다른 쓰레드 작업을 기다리도록 도와주는 클래스
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        // when
+        for (int i = 0; i < threadCount; i++) {
+            long userId = i;
+            executorService.submit(() -> {
+                try {
+                    applyService.apply(userId);
+                }
+                finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        long count = couponRepository.count();
+
+        // then
+        // 100개가 아닌 원인 : lace condition 발생
+        assertThat(count).isNotEqualTo(100);
     }
 
 }
