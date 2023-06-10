@@ -59,6 +59,9 @@ class ApplyServiceTest {
         }
 
         latch.await();
+
+        Thread.sleep(5000);
+
         long count = couponRepository.count();
 
         // then
