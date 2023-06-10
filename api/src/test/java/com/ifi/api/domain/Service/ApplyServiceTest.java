@@ -2,7 +2,6 @@ package com.ifi.api.domain.Service;
 
 import com.ifi.api.Service.ApplyService;
 import com.ifi.api.repository.CouponRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -65,7 +63,7 @@ class ApplyServiceTest {
 
         // then
         // 100개가 아닌 원인 : lace condition 발생
-        assertThat(count).isNotEqualTo(100);
+        assertThat(count).isEqualTo(100);
     }
 
 }
